@@ -74,6 +74,10 @@ pre > code {
   margin-bottom: 150px;
 }
 
+.topic-content {
+  margin-top: 40px;
+}
+
 .incoming {
   font-size: 14px;
   color: #999;
@@ -896,7 +900,7 @@ function createIncomingLinksElem (topicHeading) {
 
 function getHeadingOffsets () {
   return [].map.call(d.querySelectorAll('.heading'), function(heading) {
-    var buffer = heading.nodeName.toLowerCase() === 'h1' ? 50 : 10;
+    var buffer = 50;
     return heading.offsetTop - buffer;
   });
 }
@@ -942,11 +946,25 @@ window.onhashchange = handleHashChange;
 
 [].forEach.call(d.querySelectorAll('.heading'), addAnchor);
 
+// make all absolute links open in a new tab
+[].forEach.call(d.querySelectorAll('a[href^=http'), function (elem) {
+  elem.setAttribute('target', '_blank');
+});
+
 var stickyElem = h('h1.sticky');
 d.body.appendChild(stickyElem);
 
 var headingOffsets = getHeadingOffsets();
-var update = updateStickyHeader.bind(null, headingOffsets);
+
+// refresh heading offsets in case content changes height
+setInterval(function () {
+  headingOffsets = getHeadingOffsets();
+}, 5000);
+
+var update = function () {
+  updateStickyHeader(headingOffsets);
+};
+
 update();
 d.onscroll = update;
 
