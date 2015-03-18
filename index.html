@@ -279,7 +279,7 @@ h1.sticky small {
     instancesByReactRootID[reactRootID] = nextComponent;
 
 </code></pre>
-<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L365-L366">src/browser/ui/ReactMount.js:365,366</a></p></div><p>Finally the update is batched so that React can perform several DOM updates together and <a href="http://stackoverflow.com/questions/510213/when-does-reflow-happen-in-a-dom-environment">avoid unecessary reflow</a>:</p>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L365-L366">src/browser/ui/ReactMount.js:365,366</a></p></div><p>Finally the update is batched so that React can perform several DOM updates together and <a href="http://stackoverflow.com/questions/510213/when-does-reflow-happen-in-a-dom-environment">avoid unnecessary reflow</a>:</p>
 <div class="code-ref" data-lines="403,409"><pre><code class="lang lang-js">    ReactUpdates.batchedUpdates(
       batchedMountComponentIntoNode,
       componentInstance,
@@ -293,11 +293,11 @@ h1.sticky small {
 </div></div>
 <div class="topic" data-topic-id="headingId"><h1 id="further-reading" class="heading">Further Reading</h1><div class="topic-content"><ul>
 <li><a href="http://facebook.github.io/react/docs/">Official React docs</a></li>
-<li><a href="https://gcanti.github.io/2014/10/29/understanding-react-and-reimplementing-it-from-scratch-part-1.html">Reimplementing some React concepts from scratch</a></li>
+<li><a href="https://gcanti.github.io/2014/10/29/understanding-react-and-reimplementing-it-from-scratch-part-1.html">Re-implementing some React concepts from scratch</a></li>
 <li><a href="http://binarymuse.github.io/react-primer/build/">Some nicely annotated examples</a></li>
 </ul>
 </div></div>
-<div class="topic" data-topic-id="headingId"><h1 id="elements" class="heading">Elements</h1><div class="topic-content"><p>React keeps the definition of an &quot;element&quot; very simple. Rather than trying to abstract the general behaviour of every possible kind of element, a <code>ReactElement</code> is just a javascript object which follows a certain strucutre.</p>
+<div class="topic" data-topic-id="headingId"><h1 id="elements" class="heading">Elements</h1><div class="topic-content"><p>React keeps the definition of an &quot;element&quot; very simple. Rather than trying to abstract the general behaviour of every possible kind of element, a <code>ReactElement</code> is just a javascript object which follows a certain structure.</p>
 <h2 class="heading" id="elements:what-makes-a-valid-element-" data-topic="Elements">What makes a valid element?</h2><p>How does React know if it is dealing with an element or some other type of object? Often when faced with this question you might reach for <code>instanceof</code> but a decision was made here to use the more flexible <a href="https://en.wikipedia.org/wiki/Duck_typing">Duck Typing</a> approach. There&#39;s a reference to this in the comments:</p>
 <div class="code-ref" data-lines="443,443"><pre><code class="lang lang-js">        // Check if it quacks like an element
 
@@ -365,7 +365,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 </code></pre>
 <p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/vendor/core/invariant.js#L14-L25">src/vendor/core/invariant.js:14,25</a></p></div><p>You might wonder why the invariant function uses those <code>a, b, c, d, e, f</code> arguments. These are used to create the error message. <code>format</code> is a string template, and <code>a</code> to <code>f</code> are substituted any place <code>format</code> contains the string <code>%s</code>. So <code>format(&quot;I don&#39;t always %s but when I do I %s&quot;, thing, otherThing)</code> could be the basis for your exciting new meme generation app. Feel free to steal that one.</p>
-<p>But the question remains, couldn&#39;t we have written this using the <code>arguments</code> object instead of <code>a..f</code>? Yes we could, but it turns out there&#39;s a significiant impact on speed. Since React uses <code>invariant</code> quite often, and in some performance-critical code, even a little gain will be worthwhile. A quick google showed a <a href="http://jsperf.com/invariant-with-and-without-explicit-parameters">jsperf experiment on this topic</a> if you&#39;re interested in some numbers.</p>
+<p>But the question remains, couldn&#39;t we have written this using the <code>arguments</code> object instead of <code>a..f</code>? Yes we could, but it turns out there&#39;s a significant impact on speed. Since React uses <code>invariant</code> quite often, and in some performance-critical code, even a little gain will be worthwhile. A quick google showed a <a href="http://jsperf.com/invariant-with-and-without-explicit-parameters">jsperf experiment on this topic</a> if you&#39;re interested in some numbers.</p>
 <p>Another common React pattern we see in this function is making &quot;development-only&quot; blocks:</p>
 <div class="code-ref" data-lines="26,26"><pre><code class="lang lang-js">  if (__DEV__) {
 
