@@ -158,7 +158,7 @@ src/browser/ui/ReactMount.js:363
 src/browser/ui/ReactMount.js:365,366
 ```
 
-Finally the update is batched so that React can perform several DOM updates together and [avoid unecessary reflow](http://stackoverflow.com/questions/510213/when-does-reflow-happen-in-a-dom-environment):
+Finally the update is batched so that React can perform several DOM updates together and [avoid unnecessary reflow](http://stackoverflow.com/questions/510213/when-does-reflow-happen-in-a-dom-environment):
 
 ```embed
 src/browser/ui/ReactMount.js:403,409
@@ -171,14 +171,14 @@ Further Reading
 ====
 
 - [Official React docs](http://facebook.github.io/react/docs/)
-- [Reimplementing some React concepts from scratch](https://gcanti.github.io/2014/10/29/understanding-react-and-reimplementing-it-from-scratch-part-1.html)
+- [Re-implementing some React concepts from scratch](https://gcanti.github.io/2014/10/29/understanding-react-and-reimplementing-it-from-scratch-part-1.html)
 - [Some nicely annotated examples](http://binarymuse.github.io/react-primer/build/)
 
 
 Elements
 ====
 
-React keeps the definition of an "element" very simple. Rather than trying to abstract the general behaviour of every possible kind of element, a `ReactElement` is just a javascript object which follows a certain strucutre.
+React keeps the definition of an "element" very simple. Rather than trying to abstract the general behaviour of every possible kind of element, a `ReactElement` is just a javascript object which follows a certain structure.
 
 
 What makes a valid element?
@@ -248,7 +248,7 @@ src/vendor/core/invariant.js:14,25
 
 You might wonder why the invariant function uses those `a, b, c, d, e, f` arguments. These are used to create the error message. `format` is a string template, and `a` to `f` are substituted any place `format` contains the string `%s`. So `format("I don't always %s but when I do I %s", thing, otherThing)` could be the basis for your exciting new meme generation app. Feel free to steal that one.
 
-But the question remains, couldn't we have written this using the `arguments` object instead of `a..f`? Yes we could, but it turns out there's a significiant impact on speed. Since React uses `invariant` quite often, and in some performance-critical code, even a little gain will be worthwhile. A quick google showed a [jsperf experiment on this topic](http://jsperf.com/invariant-with-and-without-explicit-parameters) if you're interested in some numbers.
+But the question remains, couldn't we have written this using the `arguments` object instead of `a..f`? Yes we could, but it turns out there's a significant impact on speed. Since React uses `invariant` quite often, and in some performance-critical code, even a little gain will be worthwhile. A quick google showed a [jsperf experiment on this topic](http://jsperf.com/invariant-with-and-without-explicit-parameters) if you're interested in some numbers.
 
 Another common React pattern we see in this function is making "development-only" blocks:
 
