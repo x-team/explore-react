@@ -787,14 +787,21 @@ function addAnchor (header) {
 
 module.exports = addAnchor;
 
-},{"./inner-text":9,"hyperscript":4}],9:[function(require,module,exports){
+},{"./inner-text":10,"hyperscript":4}],9:[function(require,module,exports){
+var d = document;
+
+module.exports = function () {
+  return d.body.scrollTop || d.documentElement.scrollTop;
+};
+
+},{}],10:[function(require,module,exports){
 function innerText (elem) {
   return elem.innerText || elem.textContent;
 }
 
 module.exports = innerText;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var h = require('hyperscript');
 var d = document;
 
@@ -802,6 +809,7 @@ var addAnchor = require('./add-anchor');
 var dedupe = require('../lib/dedupe');
 var getHeadingId = require('../lib/get-heading-id');
 var innerText = require('./inner-text');
+var getScrollTop = require('./get-scroll-top');
 var setupHighlighter = require('./setup-highlighter');
 
 function getTopicElem (id) {
@@ -906,9 +914,8 @@ function getHeadingOffsets () {
 }
 
 function updateStickyHeader (headingOffsets) {
-  var container = d.body;
   var stickyElem = d.querySelector('h1.sticky');
-  var scrollTop = container.scrollTop;
+  var scrollTop = getScrollTop();
   var found;
 
   // find the first heading equal or greater than the scroll offset
@@ -947,7 +954,7 @@ window.onhashchange = handleHashChange;
 [].forEach.call(d.querySelectorAll('.heading'), addAnchor);
 
 // make all absolute links open in a new tab
-[].forEach.call(d.querySelectorAll('a[href^=http'), function (elem) {
+[].forEach.call(d.querySelectorAll('a[href^=http]'), function (elem) {
   elem.setAttribute('target', '_blank');
 });
 
@@ -970,7 +977,7 @@ d.onscroll = update;
 
 setTimeout(setupHighlighter, 100);
 
-},{"../lib/dedupe":1,"../lib/get-heading-id":2,"./add-anchor":8,"./inner-text":9,"./setup-highlighter":11,"hyperscript":4}],11:[function(require,module,exports){
+},{"../lib/dedupe":1,"../lib/get-heading-id":2,"./add-anchor":8,"./get-scroll-top":9,"./inner-text":10,"./setup-highlighter":12,"hyperscript":4}],12:[function(require,module,exports){
 var d = document;
 var h = require('hyperscript');
 
@@ -1001,5 +1008,5 @@ function applyHighlighter () {
 
 module.exports = loadHighlighter;
 
-},{"hyperscript":4}]},{},[10]);
+},{"hyperscript":4}]},{},[11]);
 </script></body></html>
