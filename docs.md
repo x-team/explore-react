@@ -5,6 +5,8 @@ Ever try finding your way around a huge codebase? It doesn't take very long befo
 
 It's helpful to understand the basic concepts behind React, and much has already been written about [the concepts behind React's architecture](#further-reading). I encourage you to read up if you're interested, but it's not essential for our exploration today.
 
+Have any questions or comments as we go? Head to <https://github.com/x-team/explore-react/issues/new>
+
 Hello World
 ----
 
