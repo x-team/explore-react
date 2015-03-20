@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html><head><title>Explore React</title><style type="text/css">body {
+  font: normal 18px/1.6 sans-serif;
+  padding-top: 10px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: serif;
+}
+
+h2, h3, h4, h5, h6 {
+  padding-top: 50px;
+}
+
+.heading a,
+.heading a:hover {
+  color: #000;
+  text-decoration: none;
+  display: block;
+}
+
+.heading a:hover:after {
+  content: ' #';
+  color: #999;
+}
+
+code {
+  background: #EEE;
+  padding: 2px;
+  border-radius: 2px;
+}
+
+pre > code {
+  display: block;
+}
+
+.code-ref pre {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  background: #EEE;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.code-ref p {
+  font-size: 12px;
+  margin: 10px 0 0 0;
+  padding: 2px 0;
+}
+
+.code-ref p a:link,
+.code-ref p a:visited {
+  color: #000;
+}
+
+.code-ref p a:hover {
+  color: #C00;
+}
+
+.wiki-link {
+  white-space: nowrap;
+}
+
+.content {
+  margin: 0 auto;
+  width: 80%;
+  max-width: 1200px;
+  min-width: 300px;
+}
+
+.topic {
+  border-top: 1px solid #000;
+  margin-bottom: 150px;
+}
+
+.topic-content {
+  margin-top: 40px;
+}
+
+.incoming {
+  font-size: 14px;
+  color: #999;
+  border-top: 1px solid #EEE;
+}
+
+.incoming h2 {
+  font-size: 14px;
+  font-weight: normal;
+  font-style: italic;
+}
+
+h1:target,
+h2:target,
+h3:target,
+h4:target,
+h5:target,
+h6:target {
+  -webkit-animation: highlight 2s ease;
+  animation: highlight 2s ease;
+}
+
+@-webkit-keyframes highlight {
+  from {
+    background: #FDFFA2;
+  }
+
+  to {
+    background: white;
+  }
+}
+
+@keyframes highlight {
+  from {
+    background: #FDFFA2;
+  }
+
+  to {
+    background: white;
+  }
+}
+
+h1.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #fff;
+  margin: 0;
+  width: 80%;
+  padding: 0.9em 9.5% 0 10.5%;
+  border-bottom: 1px solid #EEE;
+}
+
+h1.sticky small {
+  display: block;
+  font-size: 0.5em;
+  font-style: italic;
+  line-height: 0.5;
+  color: #333;
+}
+</style></head><body><div class="content"><div class="topic" data-topic-id="headingId"><h1 id="explore-react" class="heading">Explore React</h1><div class="topic-content"><p>Ever try finding your way around a huge codebase? It doesn&#39;t take very long before the vertigo kicks in.  When looking at something like React, what we see is the cumulative result of years of effort from hundreds of very bright people.  So how do we mere mortals even begin to understand all of the careful decisions that have gone into it?  Today might be the day you take the first couple of steps.</p>
+<p>It&#39;s helpful to understand the basic concepts behind React, and much has already been written about <a href="#further-reading">the concepts behind React&#39;s architecture</a>. I encourage you to read up if you&#39;re interested, but it&#39;s not essential for our exploration today.</p>
+<p>Have any questions or comments as we go? Head to <a href="https://github.com/x-team/explore-react/issues/new">https://github.com/x-team/explore-react/issues/new</a></p>
+<h2 class="heading" id="explore-react:hello-world" data-topic="Explore React">Hello World</h2><p>This being my first journey in to the React codebase, we&#39;ll start with the basics and see what we find. Let&#39;s begin with the most simple of examples, the Hello World. If you&#39;ve done any tutorials then something like this should look familiar:</p>
+<pre><code class="lang lang-js">React.render(
+  React.createElement(&#39;h1&#39;, null, &#39;Hello, world!&#39;),
+  document.getElementById(&#39;example&#39;)
+);
+</code></pre>
+<p>Not a lot of action on the surface here. We create an <code>h1</code> element and render it to the DOM node with ID of <code>example</code>.</p>
+<p>Now, if our only goal was to get our message onto the screen we could just set some innerHTML and we&#39;d be done. With React, there&#39;s a little more going on because it&#39;s not really trying to solve the problem of putting content on a screen. Rendering <em>changes</em> to content is where React&#39;s strength shines. We&#39;ll be taking a look under the hood to see some of the ways React tries to meet this challenge.</p>
+</div></div>
+<div class="topic" data-topic-id="headingId"><h1 id="react-render" class="heading">React.render</h1><div class="topic-content"><p>Let&#39;s take a step into <code>React.render</code> (you can use the <em>&quot;source&quot;</em> link below the code snippet if you&#39;d like to see it in context):</p>
+<div class="code-ref" data-lines="432,432"><pre><code class="lang lang-js">  render: function(nextElement, container, callback) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L432">src/browser/ui/ReactMount.js:432</a></p></div><p>If you recall our <a href="#explore-react:hello-world">Hello World example</a>, <code>nextElement</code> is the <code>h1</code> we created, <code>container</code> is the <code>#example</code> DOM node, and we have omitted the <code>callback</code> parameter (this is optional).</p>
+<p>At a high level we can describe this function in three steps:</p>
+<ol>
+<li><a href="#react-render:make-sure-we-39-re-rendering-a-valid-element">Make sure we&#39;re rendering a valid element</a></li>
+<li><a href="#react-render:replace-it-or-reuse-it-">Work out whether to replace or reuse the previous element</a></li>
+<li><a href="#react-render:render-a-new-component">Finally render a new component</a></li>
+</ol>
+<p>Before we go on it&#39;s interesting to note the use of the argument name <code>nextElement</code>. We should ask the question: why is it called &quot;next element&quot; and not just &quot;element&quot;? As mentioned earlier, React is not merely trying to render content to the page. Its main concern is in efficiently rendering <em>changing content</em>.  In that light the name <code>nextElement</code> makes more sense. When the content changes, rather than updating the DOM manually ourselves we simply create the &quot;next element&quot; and pass it to React to work out the best way to apply those changes.</p>
+<p>We&#39;ll also see further on in <a class="wiki-link" href="#react-render:replace-it-or-reuse-it-" data-topic="React.render" data-subheading="Replace it or reuse it?">React.render&rarr;Replace it or reuse it?</a> that <code>nextElement</code> has a counterpart of <code>prevElement</code>, which adds useful context.</p>
+<h2 class="heading" id="react-render:make-sure-we-39-re-rendering-a-valid-element" data-topic="React.render">Make sure we&#39;re rendering a valid element</h2><p>The first thing the <code>render</code> function does is make sure we have a valid element. Placing this check at the function&#39;s entry-point follows the same idea as a booth to check your passport at a border crossing. Once we have verified that <code>nextElement</code> is a valid React element we can freely make assumptions on what to expect from it in all of the following function calls, without having to re-check each time.</p>
+<p>React enforces the &quot;valid elements only&quot; rule by putting <code>React.isValidElement(nextElement)</code> inside a call to the <code>invariant</code> function. This function simply checks for a truthy first argument and throws an error otherwise:</p>
+<div class="code-ref" data-lines="433,449"><pre><code class="lang lang-js">    invariant(
+      ReactElement.isValidElement(nextElement),
+      &#39;React.render(): Invalid component element.%s&#39;,
+      (
+        typeof nextElement === &#39;string&#39; ?
+          &#39; Instead of passing an element string, make sure to instantiate &#39; +
+          &#39;it by passing it to React.createElement.&#39; :
+        typeof nextElement === &#39;function&#39; ?
+          &#39; Instead of passing a component class, make sure to instantiate &#39; +
+          &#39;it by passing it to React.createElement.&#39; :
+        // Check if it quacks like an element
+        nextElement != null &amp;&amp; nextElement.props !== undefined ?
+          &#39; This may be caused by unintentionally loading two independent &#39; +
+          &#39;copies of React.&#39; :
+          &#39;&#39;
+      )
+    );
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L433-L449">src/browser/ui/ReactMount.js:433,449</a></p></div><p>The <code>invariant</code> function is a simple concept but there are still some interesting implementation details which you can read more about in <a class="wiki-link" href="#the-invariant-function" data-topic="The invariant function" data-subheading="undefined">The invariant function</a>.</p>
+<p>In our example we&#39;re using a &quot;native element&quot; (representing an <code>&lt;h1&gt;</code>), so a lot of the complexity of dealing with elements won&#39;t apply here. You can read some more about elements in the <a class="wiki-link" href="#elements" data-topic="Elements" data-subheading="undefined">Elements</a> section.</p>
+<h2 class="heading" id="react-render:replace-it-or-reuse-it-" data-topic="React.render">Replace it or reuse it?</h2><p>As mentioned earlier, React&#39;s strength is in rendering changes. As we&#39;ll see further on, part of this strength comes from the fact that React makes the decision of whether to replace or reuse, freeing the developer from needing to handle both cases.</p>
+<p>Looking further down in the <code>React.render</code> function we see a comparison of two elements to see whether we&#39;ll be updating a previously rendered element or rendering a new one:</p>
+<div class="code-ref" data-lines="454,455"><pre><code class="lang lang-js">      var prevElement = prevComponent._currentElement;
+      if (shouldUpdateReactComponent(prevElement, nextElement)) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L454-L455">src/browser/ui/ReactMount.js:454,455</a></p></div><p><code>prevComponent</code> is a component that was previously rendered to the <code>container</code> element. React looks up this information by storing component IDs. You can read more about that in the <a class="wiki-link" href="#react-ids" data-topic="React IDs" data-subheading="undefined">React IDs</a> section.</p>
+<p>For now, let&#39;s take a look inside the <code>shouldUpdateReactComponent</code> function:</p>
+<div class="code-ref" data-lines="28,28"><pre><code class="lang lang-js">function shouldUpdateReactComponent(prevElement, nextElement) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/shouldUpdateReactComponent.js#L28">src/core/shouldUpdateReactComponent.js:28</a></p></div><p>First of all, if either <code>prevElement</code> or <code>nextElement</code> don&#39;t exist we can return straight away with the answer <em>&quot;Nope, don&#39;t update the component. Make a new one&quot;</em>:</p>
+<div class="code-ref" data-lines="29,29"><pre><code class="lang lang-js">  if (prevElement != null &amp;&amp; nextElement != null) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/shouldUpdateReactComponent.js#L29">src/core/shouldUpdateReactComponent.js:29</a></p></div><p>In the next couple of lines we see how the function handles scalar values. This is for the case where <code>prevElement</code> or <code>nextElement</code> is actually a string or a number rather than an element object. In this situation we can get our answer very quickly:</p>
+<ul>
+<li>Are <code>prevElement</code> and <code>nextElement</code> <em>both</em> scalars? Update.</li>
+<li><code>prevElement</code> is a scalar but <code>nextElement</code> is an element object? Replace.</li>
+</ul>
+<div class="code-ref" data-lines="30,34"><pre><code class="lang lang-js">    var prevType = typeof prevElement;
+    var nextType = typeof nextElement;
+    if (prevType === &#39;string&#39; || prevType === &#39;number&#39;) {
+      return (nextType === &#39;string&#39; || nextType === &#39;number&#39;);
+    } else {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/shouldUpdateReactComponent.js#L30-L34">src/core/shouldUpdateReactComponent.js:30,34</a></p></div><p>Now, if <em>neither</em> are scalars we need to check some more things to answer the question. We will only update the previous component if all of the following are true:</p>
+<ul>
+<li>both elements must have the same <code>type</code> attribute (Note: this is different to what we get from <code>typeof</code>. In our example the type is <code>&#39;h1&#39;</code>, but it could be any custom element type you have defined).</li>
+<li>both elements must have the same <code>key</code>. (You can read more about <a href="https://facebook.github.io/react/docs/multiple-components.html#dynamic-children">why keys are important in the React docs</a>)</li>
+<li>both elements must have the same owner.</li>
+</ul>
+<div class="code-ref" data-lines="35,38"><pre><code class="lang lang-js">      if (nextType === &#39;object&#39; &amp;&amp;
+          prevElement.type === nextElement.type &amp;&amp;
+          prevElement.key === nextElement.key) {
+        var ownersMatch = prevElement._owner === nextElement._owner;
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/shouldUpdateReactComponent.js#L35-L38">src/core/shouldUpdateReactComponent.js:35,38</a></p></div><p>This brings up an interesting concept. All of these checks are more or less saying <em>&quot;If the 2 elements are the same, update the content. Otherwise replace the old element with the new one&quot;</em>. Sounds pretty obvious when you say it like that. So why did we need to go to all of this trouble just to tell if two things are the same?  The clever thing about this approach is that React doesn&#39;t actually care whether the two things are the actual same element. It just needs to determine whether they are <em>close enough</em> to be able to efficiently transition from one to the next.</p>
+<p>It&#39;s an important underlying concept to grasp when using React. You&#39;ll notice that when you write your own custom elements, the <code>render</code> function returns new elements every time it is executed. If you&#39;re used to other paradigms this can feel strange because normally we associate a significant cost with &quot;creating something&quot;. The instinct then is to locate the existing element ourselves and update it, to avoid the waste of creating a new one. React turns this idea upside down. Creating a React element is cheap, so we just create every time and leave it to React to decide how to render it.  Not only will the end result be more efficient than if we updated DOM elements manually, our code is also much cleaner, going from two execution paths (ie. &quot;update? create?&quot;) to one.</p>
+<p>In the case of our &quot;Hello World&quot; example, there won&#39;t be any <code>prevComponent</code>.  But if there was we would either update that component:</p>
+<div class="code-ref" data-lines="455,461"><pre><code class="lang lang-js">      if (shouldUpdateReactComponent(prevElement, nextElement)) {
+        return ReactMount._updateRootComponent(
+          prevComponent,
+          nextElement,
+          container,
+          callback
+        ).getPublicInstance();
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L455-L461">src/browser/ui/ReactMount.js:455,461</a></p></div><p>or remove the existing one before proceeding to render the new element:</p>
+<div class="code-ref" data-lines="462,464"><pre><code class="lang lang-js">      } else {
+        ReactMount.unmountComponentAtNode(container);
+      }
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L462-L464">src/browser/ui/ReactMount.js:462,464</a></p></div><h2 class="heading" id="react-render:render-a-new-component" data-topic="React.render">Render a new component</h2><p>To recap, we&#39;ve determined that there is no existing component, and we want to render a new one. We call the <code>_renderNewRootComponent</code> function:</p>
+<div class="code-ref" data-lines="492,496"><pre><code class="lang lang-js">    var component = ReactMount._renderNewRootComponent(
+      nextElement,
+      container,
+      shouldReuseMarkup
+    ).getPublicInstance();
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L492-L496">src/browser/ui/ReactMount.js:492,496</a></p></div><p>Let&#39;s take a look at where that function is defined:</p>
+<div class="code-ref" data-lines="377,381"><pre><code class="lang lang-js">  _renderNewRootComponent: function(
+    nextElement,
+    container,
+    shouldReuseMarkup
+  ) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L377-L381">src/browser/ui/ReactMount.js:377,381</a></p></div><p>See that <code>shouldReuseMarkup</code> argument? We already decided we weren&#39;t going to reuse an existing component in the previous step, but this is something else. In the case where we have rendered our React elements on the server, we still won&#39;t have a <code>prevComponent</code> but we <em>will</em> have some React markup inside <code>container</code>. As long as it looks valid, React will attempt to pick up the existing markup and run with it.</p>
+<p>The next thing we see in this function is a warning against nested updates, by making sure the <code>ReactCurrentOwner.current</code> is <code>null</code>. The &quot;current owner&quot; is whichever component is running its <code>render</code> function. If we&#39;re rendering the root component (like we are here) we expect there to be no owner:</p>
+<div class="code-ref" data-lines="385,391"><pre><code class="lang lang-js">    warning(
+      ReactCurrentOwner.current == null,
+      &#39;_renderNewRootComponent(): Render methods should be a pure function &#39; +
+      &#39;of props and state; triggering nested component updates from &#39; +
+      &#39;render is not allowed. If necessary, trigger nested updates in &#39; +
+      &#39;componentDidUpdate.&#39;
+    );
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L385-L391">src/browser/ui/ReactMount.js:385,391</a></p></div><p>Next we instantiate the component and register it. Registering does a couple of things like:</p>
+<ul>
+<li>starting up a monitor to keep track of the scroll value (so that React can provide &quot;virtual DOM scroll events&quot; to its &quot;virtual DOM elements&quot;):</li>
+</ul>
+<div class="code-ref" data-lines="363,363"><pre><code class="lang lang-js">    ReactBrowserEventEmitter.ensureScrollValueMonitoring();
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L363">src/browser/ui/ReactMount.js:363</a></p></div><ul>
+<li>indexes the container and the root component instance against the root ID (so that we always have an easy way to find the root node of the tree):</li>
+</ul>
+<div class="code-ref" data-lines="365,366"><pre><code class="lang lang-js">    var reactRootID = ReactMount.registerContainer(container);
+    instancesByReactRootID[reactRootID] = nextComponent;
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L365-L366">src/browser/ui/ReactMount.js:365,366</a></p></div><p>Finally the update is batched so that React can perform several DOM updates together and <a href="http://stackoverflow.com/questions/510213/when-does-reflow-happen-in-a-dom-environment">avoid unnecessary reflow</a>:</p>
+<div class="code-ref" data-lines="403,409"><pre><code class="lang lang-js">    ReactUpdates.batchedUpdates(
+      batchedMountComponentIntoNode,
+      componentInstance,
+      reactRootID,
+      container,
+      shouldReuseMarkup
+    );
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L403-L409">src/browser/ui/ReactMount.js:403,409</a></p></div><p>There&#39;s a lot of interesting things happening inside <code>ReactUpdates.batchedUpdates</code>, and it probably deserves a separate post all to itself. We&#39;ve only just scratched the surface, but my hope is that what we&#39;ve looked at here will be enough to get you started on your own exploration. Adventure awaits!</p>
+</div></div>
+<div class="topic" data-topic-id="headingId"><h1 id="further-reading" class="heading">Further Reading</h1><div class="topic-content"><ul>
+<li><a href="http://facebook.github.io/react/docs/">Official React docs</a></li>
+<li><a href="https://gcanti.github.io/2014/10/29/understanding-react-and-reimplementing-it-from-scratch-part-1.html">Re-implementing some React concepts from scratch</a></li>
+<li><a href="http://binarymuse.github.io/react-primer/build/">Some nicely annotated examples</a></li>
+</ul>
+</div></div>
+<div class="topic" data-topic-id="headingId"><h1 id="elements" class="heading">Elements</h1><div class="topic-content"><p>React keeps the definition of an &quot;element&quot; very simple. Rather than trying to abstract the general behaviour of every possible kind of element, a <code>ReactElement</code> is just a javascript object which follows a certain structure.</p>
+<h2 class="heading" id="elements:what-makes-a-valid-element-" data-topic="Elements">What makes a valid element?</h2><p>How does React know if it is dealing with an element or some other type of object? Often when faced with this question you might reach for <code>instanceof</code> but a decision was made here to use the more flexible <a href="https://en.wikipedia.org/wiki/Duck_typing">Duck Typing</a> approach. There&#39;s a reference to this in the comments:</p>
+<div class="code-ref" data-lines="443,443"><pre><code class="lang lang-js">        // Check if it quacks like an element
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ui/ReactMount.js#L443">src/browser/ui/ReactMount.js:443</a></p></div><p>Stepping into the <code>isValidElement</code> function we check for the element&#39;s &quot;quack&quot; by looking for the presence of a special flag, <code>_isReactElement</code>:</p>
+<div class="code-ref" data-lines="295,295"><pre><code class="lang lang-js">  var isElement = !!(object &amp;&amp; object._isReactElement);
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/classic/element/ReactElement.js#L295">src/classic/element/ReactElement.js:295</a></p></div><p>The flag is set on the <code>ReactElement</code> prototype defined earlier in that same file:</p>
+<div class="code-ref" data-lines="140,143"><pre><code class="lang lang-js">// ReactElement should be indistinguishable from a plain object.
+ReactElement.prototype = {
+  _isReactElement: true
+};
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/classic/element/ReactElement.js#L140-L143">src/classic/element/ReactElement.js:140,143</a></p></div></div></div>
+<div class="topic" data-topic-id="headingId"><h1 id="react-ids" class="heading">React IDs</h1><div class="topic-content"><p>React assigns every element a unique ID (you&#39;ll see it in the custom <code>data-reactid</code> attribute if you inspect the DOM). These IDs usually look like numbers joined by dots, eg. <code>.0.0.1</code>, and each dot represents a new level in the element tree.  Doing it this way means it&#39;s possible to do a lot of navigating just by manipulating that string.  For example we can find the ID of the parent:</p>
+<div class="code-ref" data-lines="85,87"><pre><code class="lang lang-js">function getParentID(id) {
+  return id ? id.substr(0, id.lastIndexOf(SEPARATOR)) : &#39;&#39;;
+}
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/ReactInstanceHandles.js#L85-L87">src/core/ReactInstanceHandles.js:85,87</a></p></div><p>By the way, that <code>SEPARATOR</code> constant is defined earlier in the same file:</p>
+<div class="code-ref" data-lines="19,19"><pre><code class="lang lang-js">var SEPARATOR = &#39;.&#39;;
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/ReactInstanceHandles.js#L19">src/core/ReactInstanceHandles.js:19</a></p></div><p>There are also a lot of other useful functions in here for doing more complicated traversals, like finding the first common ancestor of two elements:</p>
+<div class="code-ref" data-lines="138,138"><pre><code class="lang lang-js">function getFirstCommonAncestorID(oneID, twoID) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/core/ReactInstanceHandles.js#L138">src/core/ReactInstanceHandles.js:138</a></p></div><p>It&#39;s also useful to note that IDs are treated a little differently when rendering in a browser or on a server. In the browser IDs are sequential, starting at <code>0</code> and incrementing each time you ask for a new one:</p>
+<div class="code-ref" data-lines="15,21"><pre><code class="lang lang-js">var nextReactRootIndex = 0;
+
+var ClientReactRootIndex = {
+  createReactRootIndex: function() {
+    return nextReactRootIndex++;
+  }
+};
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/ClientReactRootIndex.js#L15-L21">src/browser/ClientReactRootIndex.js:15,21</a></p></div><p>However when rendering on the server they are chosen randomly:</p>
+<div class="code-ref" data-lines="21,27"><pre><code class="lang lang-js">var GLOBAL_MOUNT_POINT_MAX = Math.pow(2, 53);
+
+var ServerReactRootIndex = {
+  createReactRootIndex: function() {
+    return Math.ceil(Math.random() * GLOBAL_MOUNT_POINT_MAX);
+  }
+};
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/browser/server/ServerReactRootIndex.js#L21-L27">src/browser/server/ServerReactRootIndex.js:21,27</a></p></div><p>There are some interesting comments on the reasons in this <a href="https://groups.google.com/forum/#!topic/reactjs/ewTN-WOP1w8">thread about data-reactid</a>.</p>
+</div></div>
+<div class="topic" data-topic-id="headingId"><h1 id="the-invariant-function" class="heading">The invariant function</h1><div class="topic-content"><div class="code-ref" data-lines="14,25"><pre><code class="lang lang-js">/**
+ * Use invariant() to assert state which your program assumes to be true.
+ *
+ * Provide sprintf-style format (only %s is supported) and arguments
+ * to provide information about what broke and what you were
+ * expecting.
+ *
+ * The invariant message will be stripped in production, but the invariant
+ * will remain to ensure logic does not differ in production.
+ */
+
+var invariant = function(condition, format, a, b, c, d, e, f) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/vendor/core/invariant.js#L14-L25">src/vendor/core/invariant.js:14,25</a></p></div><p>You might wonder why the invariant function uses those <code>a, b, c, d, e, f</code> arguments. These are used to create the error message. <code>format</code> is a string template, and <code>a</code> to <code>f</code> are substituted any place <code>format</code> contains the string <code>%s</code>. So <code>format(&quot;I don&#39;t always %s but when I do I %s&quot;, thing, otherThing)</code> could be the basis for your exciting new meme generation app. Feel free to steal that one.</p>
+<p>But the question remains, couldn&#39;t we have written this using the <code>arguments</code> object instead of <code>a..f</code>? Yes we could, but it turns out there&#39;s a significant impact on speed. Since React uses <code>invariant</code> quite often, and in some performance-critical code, even a little gain will be worthwhile. A quick google showed a <a href="http://jsperf.com/invariant-with-and-without-explicit-parameters">jsperf experiment on this topic</a> if you&#39;re interested in some numbers.</p>
+<p>Another common React pattern we see in this function is making &quot;development-only&quot; blocks:</p>
+<div class="code-ref" data-lines="26,26"><pre><code class="lang lang-js">  if (__DEV__) {
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/src/vendor/core/invariant.js#L26">src/vendor/core/invariant.js:26</a></p></div><p>This is used in several places to give extra warnings and feedback when running in a development environment, in a way that is easy to strip out for a production build.</p>
+<p>The interesting thing here is that if you inspect code running in a browser, you won&#39;t see <code>__DEV__</code> anywhere. In its place you&#39;ll see:</p>
+<pre><code class="lang lang-js">if (&quot;production&quot; !== &quot;development&quot;) {
+</code></pre>
+<p>You can take a look at how this is done (with the help of the <a href="https://npmjs.com/package/recast">recast</a> module) here:</p>
+<div class="code-ref" data-lines="42,45"><pre><code class="lang lang-js">    // replace __DEV__ with process.env.NODE_ENV !== &#39;production&#39;
+    if (nodePath.value.name === &#39;__DEV__&#39;) {
+      nodePath.replace(DEV_EXPRESSION);
+    }
+
+</code></pre>
+<p>source: <a target="_blank" href="https://github.com/facebook/react/blob/v0.13.1/vendor/constants.js#L42-L45">vendor/constants.js:42,45</a></p></div></div></div></div><script>(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+function dedupe (acc, item) {
+  if (acc.indexOf(item) === -1) { acc.push(item); }
+  return acc;
+}
+
+module.exports = dedupe;
+
+},{}],2:[function(require,module,exports){
+/*
+
+  Create a unique anchor ID by converting the heading text into a suitable format.
+
+*/
+module.exports = function getHeadingId (raw) {
+  return raw.trim().toLowerCase().replace(/[^\w]+/g, '-');
+};
+
+},{}],3:[function(require,module,exports){
+
+},{}],4:[function(require,module,exports){
+var split = require('browser-split')
+var ClassList = require('class-list')
+require('html-element')
+
+function context () {
+
+  var cleanupFuncs = []
+
+  function h() {
+    var args = [].slice.call(arguments), e = null
+    function item (l) {
+      var r
+      function parseClass (string) {
+        var m = split(string, /([\.#]?[a-zA-Z0-9_:-]+)/)
+        if(/^\.|#/.test(m[1]))
+          e = document.createElement('div')
+        forEach(m, function (v) {
+          var s = v.substring(1,v.length)
+          if(!v) return
+          if(!e)
+            e = document.createElement(v)
+          else if (v[0] === '.')
+            ClassList(e).add(s)
+          else if (v[0] === '#')
+            e.setAttribute('id', s)
+        })
+      }
+
+      if(l == null)
+        ;
+      else if('string' === typeof l) {
+        if(!e)
+          parseClass(l)
+        else
+          e.appendChild(r = document.createTextNode(l))
+      }
+      else if('number' === typeof l
+        || 'boolean' === typeof l
+        || l instanceof Date
+        || l instanceof RegExp ) {
+          e.appendChild(r = document.createTextNode(l.toString()))
+      }
+      //there might be a better way to handle this...
+      else if (isArray(l))
+        forEach(l, item)
+      else if(isNode(l))
+        e.appendChild(r = l)
+      else if(l instanceof Text)
+        e.appendChild(r = l)
+      else if ('object' === typeof l) {
+        for (var k in l) {
+          if('function' === typeof l[k]) {
+            if(/^on\w+/.test(k)) {
+              (function (k, l) { // capture k, l in the closure
+                if (e.addEventListener){
+                  e.addEventListener(k.substring(2), l[k], false)
+                  cleanupFuncs.push(function(){
+                    e.removeEventListener(k.substring(2), l[k], false)
+                  })
+                }else{
+                  e.attachEvent(k, l[k])
+                  cleanupFuncs.push(function(){
+                    e.detachEvent(k, l[k])
+                  })
+                }
+              })(k, l)
+            } else {
+              // observable
+              e[k] = l[k]()
+              cleanupFuncs.push(l[k](function (v) {
+                e[k] = v
+              }))
+            }
+          }
+          else if(k === 'style') {
+            if('string' === typeof l[k]) {
+              e.style.cssText = l[k]
+            }else{
+              for (var s in l[k]) (function(s, v) {
+                if('function' === typeof v) {
+                  // observable
+                  e.style.setProperty(s, v())
+                  cleanupFuncs.push(v(function (val) {
+                    e.style.setProperty(s, val)
+                  }))
+                } else
+                  e.style.setProperty(s, l[k][s])
+              })(s, l[k][s])
+            }
+          } else if (k.substr(0, 5) === "data-") {
+            e.setAttribute(k, l[k])
+          } else {
+            e[k] = l[k]
+          }
+        }
+      } else if ('function' === typeof l) {
+        //assume it's an observable!
+        var v = l()
+        e.appendChild(r = isNode(v) ? v : document.createTextNode(v))
+
+        cleanupFuncs.push(l(function (v) {
+          if(isNode(v) && r.parentElement)
+            r.parentElement.replaceChild(v, r), r = v
+          else
+            r.textContent = v
+        }))
+      }
+
+      return r
+    }
+    while(args.length)
+      item(args.shift())
+
+    return e
+  }
+
+  h.cleanup = function () {
+    for (var i = 0; i < cleanupFuncs.length; i++){
+      cleanupFuncs[i]()
+    }
+    cleanupFuncs.length = 0
+  }
+
+  return h
+}
+
+var h = module.exports = context()
+h.context = context
+
+function isNode (el) {
+  return el && el.nodeName && el.nodeType
+}
+
+function isText (el) {
+  return el && el.nodeName === '#text' && el.nodeType == 3
+}
+
+function forEach (arr, fn) {
+  if (arr.forEach) return arr.forEach(fn)
+  for (var i = 0; i < arr.length; i++) fn(arr[i], i)
+}
+
+function isArray (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]'
+}
+
+},{"browser-split":5,"class-list":6,"html-element":3}],5:[function(require,module,exports){
+/*!
+ * Cross-Browser Split 1.1.1
+ * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
+ * Available under the MIT License
+ * ECMAScript compliant, uniform cross-browser split method
+ */
+
+/**
+ * Splits a string into an array of strings using a regex or string separator. Matches of the
+ * separator are not included in the result array. However, if `separator` is a regex that contains
+ * capturing groups, backreferences are spliced into the result each time `separator` is matched.
+ * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
+ * cross-browser.
+ * @param {String} str String to split.
+ * @param {RegExp|String} separator Regex or string to use for separating the string.
+ * @param {Number} [limit] Maximum number of items to include in the result array.
+ * @returns {Array} Array of substrings.
+ * @example
+ *
+ * // Basic use
+ * split('a b c d', ' ');
+ * // -> ['a', 'b', 'c', 'd']
+ *
+ * // With limit
+ * split('a b c d', ' ', 2);
+ * // -> ['a', 'b']
+ *
+ * // Backreferences in result array
+ * split('..word1 word2..', /([a-z]+)(\d+)/i);
+ * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
+ */
+module.exports = (function split(undef) {
+
+  var nativeSplit = String.prototype.split,
+    compliantExecNpcg = /()??/.exec("")[1] === undef,
+    // NPCG: nonparticipating capturing group
+    self;
+
+  self = function(str, separator, limit) {
+    // If `separator` is not a regex, use `nativeSplit`
+    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
+      return nativeSplit.call(str, separator, limit);
+    }
+    var output = [],
+      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
+      (separator.sticky ? "y" : ""),
+      // Firefox 3+
+      lastLastIndex = 0,
+      // Make `global` and avoid `lastIndex` issues by working with a copy
+      separator = new RegExp(separator.source, flags + "g"),
+      separator2, match, lastIndex, lastLength;
+    str += ""; // Type-convert
+    if (!compliantExecNpcg) {
+      // Doesn't need flags gy, but they don't hurt
+      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
+    }
+    /* Values for `limit`, per the spec:
+     * If undefined: 4294967295 // Math.pow(2, 32) - 1
+     * If 0, Infinity, or NaN: 0
+     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
+     * If other: Type-convert, then use the above rules
+     */
+    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
+    limit >>> 0; // ToUint32(limit)
+    while (match = separator.exec(str)) {
+      // `separator.lastIndex` is not reliable cross-browser
+      lastIndex = match.index + match[0].length;
+      if (lastIndex > lastLastIndex) {
+        output.push(str.slice(lastLastIndex, match.index));
+        // Fix browsers whose `exec` methods don't consistently return `undefined` for
+        // nonparticipating capturing groups
+        if (!compliantExecNpcg && match.length > 1) {
+          match[0].replace(separator2, function() {
+            for (var i = 1; i < arguments.length - 2; i++) {
+              if (arguments[i] === undef) {
+                match[i] = undef;
+              }
+            }
+          });
+        }
+        if (match.length > 1 && match.index < str.length) {
+          Array.prototype.push.apply(output, match.slice(1));
+        }
+        lastLength = match[0].length;
+        lastLastIndex = lastIndex;
+        if (output.length >= limit) {
+          break;
+        }
+      }
+      if (separator.lastIndex === match.index) {
+        separator.lastIndex++; // Avoid an infinite loop
+      }
+    }
+    if (lastLastIndex === str.length) {
+      if (lastLength || !separator.test("")) {
+        output.push("");
+      }
+    } else {
+      output.push(str.slice(lastLastIndex));
+    }
+    return output.length > limit ? output.slice(0, limit) : output;
+  };
+
+  return self;
+})();
+
+},{}],6:[function(require,module,exports){
+// contains, add, remove, toggle
+var indexof = require('indexof')
+
+module.exports = ClassList
+
+function ClassList(elem) {
+    var cl = elem.classList
+
+    if (cl) {
+        return cl
+    }
+
+    var classList = {
+        add: add
+        , remove: remove
+        , contains: contains
+        , toggle: toggle
+        , toString: $toString
+        , length: 0
+        , item: item
+    }
+
+    return classList
+
+    function add(token) {
+        var list = getTokens()
+        if (indexof(list, token) > -1) {
+            return
+        }
+        list.push(token)
+        setTokens(list)
+    }
+
+    function remove(token) {
+        var list = getTokens()
+            , index = indexof(list, token)
+
+        if (index === -1) {
+            return
+        }
+
+        list.splice(index, 1)
+        setTokens(list)
+    }
+
+    function contains(token) {
+        return indexof(getTokens(), token) > -1
+    }
+
+    function toggle(token) {
+        if (contains(token)) {
+            remove(token)
+            return false
+        } else {
+            add(token)
+            return true
+        }
+    }
+
+    function $toString() {
+        return elem.className
+    }
+
+    function item(index) {
+        var tokens = getTokens()
+        return tokens[index] || null
+    }
+
+    function getTokens() {
+        var className = elem.className
+
+        return filter(className.split(" "), isTruthy)
+    }
+
+    function setTokens(list) {
+        var length = list.length
+
+        elem.className = list.join(" ")
+        classList.length = length
+
+        for (var i = 0; i < list.length; i++) {
+            classList[i] = list[i]
+        }
+
+        delete list[length]
+    }
+}
+
+function filter (arr, fn) {
+    var ret = []
+    for (var i = 0; i < arr.length; i++) {
+        if (fn(arr[i])) ret.push(arr[i])
+    }
+    return ret
+}
+
+function isTruthy(value) {
+    return !!value
+}
+
+},{"indexof":7}],7:[function(require,module,exports){
+
+var indexOf = [].indexOf;
+
+module.exports = function(arr, obj){
+  if (indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+},{}],8:[function(require,module,exports){
+var h = require('hyperscript');
+var innerText = require('./inner-text');
+
+function addAnchor (header) {
+  var headerText = innerText(header);
+  var anchor = h('a', {
+    href: '#' + header.id
+  }, headerText);
+
+  header.innerHTML = anchor.outerHTML;
+}
+
+module.exports = addAnchor;
+
+},{"./inner-text":10,"hyperscript":4}],9:[function(require,module,exports){
+var d = document;
+
+module.exports = function () {
+  return d.body.scrollTop || d.documentElement.scrollTop;
+};
+
+},{}],10:[function(require,module,exports){
+function innerText (elem) {
+  return elem.innerText || elem.textContent;
+}
+
+module.exports = innerText;
+
+},{}],11:[function(require,module,exports){
+var h = require('hyperscript');
+var d = document;
+
+var addAnchor = require('./add-anchor');
+var dedupe = require('../lib/dedupe');
+var getHeadingId = require('../lib/get-heading-id');
+var innerText = require('./inner-text');
+var getScrollTop = require('./get-scroll-top');
+var setupHighlighter = require('./setup-highlighter');
+
+function getTopicElem (id) {
+  return d.getElementById(id);
+}
+
+function getContentHolderElem () {
+  return d.querySelector('.content');
+}
+
+function showTopic (topic) {
+  var elem = (typeof topic === 'string') ?
+      getTopicElem(topic) :
+      topic;
+
+  if (!elem) {
+    throw new Error('topic not found: ' + topic);
+  }
+}
+
+function getCurrentLocationHash () {
+  return window.location.hash.replace(/^\#/, '');
+}
+
+function handleHashChange (event) {
+  var hash = getCurrentLocationHash();
+  showTopic(hash);
+}
+
+function findNearestHeading (elem) {
+  var prev;
+  while (elem) {
+    prev = elem.previousElementSibling;
+    if (!prev) {
+      prev = elem.parentElement;
+    }
+
+    if (!prev) { throw new Error('no heading found'); }
+
+    // found a heading
+    if (prev.nodeName.toLowerCase().match(/^h(\d)$/)) {
+      return prev;
+    }
+
+    // keep stepping back/up until a heading is found
+    elem = prev;
+  }
+}
+
+function createIncomingLinksElem (topicHeading) {
+  var currentTopicId = getHeadingId(topicHeading);
+  var foundLinks = d.querySelectorAll('a[data-topic="' + topicHeading + '"]');
+  var foundHeadings = [].map.call(foundLinks, findNearestHeading)
+      .reduce(dedupe, [])
+      .filter(function (elem) {
+        var id = elem.getAttribute('id');
+
+        // filter out this item if it is a link from within the same topic
+        if (id === currentTopicId ||
+            id.indexOf(currentTopicId + ':') === 0) { return false; }
+
+        return true;
+      });
+
+  if (!foundHeadings.length) { return null; }
+
+  var listItems = foundHeadings.map(function (elem) {
+    var parts;
+    var topicHeading;
+    var subHeading;
+    var id = elem.getAttribute('id');
+
+    if (elem.nodeName === 'H1') {
+      topicHeading = innerText(elem);
+      parts = [topicHeading];
+    }
+    else {
+      topicHeading = elem.getAttribute('data-topic');
+      subHeading = innerText(elem);
+      parts = [topicHeading, subHeading];
+    }
+
+    var anchorElem = h('a', { href: '#' + id });
+    anchorElem.innerHTML = parts.join('&rarr;');
+
+    return h('li', null, anchorElem);
+  });
+
+  var elem = h('div.incoming', null, [
+    h('h2', null, 'Linked from:'),
+    h('ul', null, listItems)
+  ]);
+
+  return elem;
+}
+
+function getHeadingOffsets () {
+  return [].map.call(d.querySelectorAll('.heading'), function(heading) {
+    var buffer = 50;
+    return heading.offsetTop - buffer;
+  });
+}
+
+function updateStickyHeader (headingOffsets) {
+  var stickyElem = d.querySelector('h1.sticky');
+  var scrollTop = getScrollTop();
+  var found;
+
+  // find the first heading equal or greater than the scroll offset
+  for (var i = 0; i < headingOffsets.length; i += 1) {
+    if (headingOffsets[i] >= scrollTop) { found = i; break; }
+  }
+
+  if (found === undefined) { found = headingOffsets.length; }
+
+  // we actually want the heading before
+  found = Math.max(0, found - 1);
+
+  var heading = d.querySelectorAll('.heading')[found];
+  var topic = heading.getAttribute('data-topic');
+
+  stickyElem.innerHTML = !!topic ?
+    '<small>' + topic + '</small>' + innerText(heading):
+    innerText(heading);
+}
+
+// ----
+
+window.onhashchange = handleHashChange;
+
+[].forEach.call(d.querySelectorAll('.content > .topic'), function (topicElem) {
+  var topicId = topicElem.getAttribute('id');
+  var h1 = topicElem.querySelector('h1');
+  var heading = innerText(h1);
+
+  var elem = createIncomingLinksElem(heading);
+  if (elem) {
+    topicElem.appendChild(elem);
+  }
+});
+
+[].forEach.call(d.querySelectorAll('.heading'), addAnchor);
+
+// make all absolute links open in a new tab
+[].forEach.call(d.querySelectorAll('a[href^=http]'), function (elem) {
+  elem.setAttribute('target', '_blank');
+});
+
+var stickyElem = h('h1.sticky');
+d.body.appendChild(stickyElem);
+
+var headingOffsets = getHeadingOffsets();
+
+// refresh heading offsets in case content changes height
+setInterval(function () {
+  headingOffsets = getHeadingOffsets();
+}, 5000);
+
+var update = function () {
+  updateStickyHeader(headingOffsets);
+};
+
+update();
+d.onscroll = update;
+
+setTimeout(setupHighlighter, 100);
+
+},{"../lib/dedupe":1,"../lib/get-heading-id":2,"./add-anchor":8,"./get-scroll-top":9,"./inner-text":10,"./setup-highlighter":12,"hyperscript":4}],12:[function(require,module,exports){
+var d = document;
+var h = require('hyperscript');
+
+// load syntax highlighting code
+function loadHighlighter () {
+  var headElem = d.querySelector('head');
+
+  headElem.appendChild(h('link', {
+    rel: 'stylesheet',
+    href: 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css'
+  }));
+
+  headElem.appendChild(h('script', {
+    src: 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js'
+  }));
+
+  var interval = setInterval(function () {
+    if (!!window.hljs) {
+      clearInterval(interval);
+      applyHighlighter();
+    }
+  }, 100);
+}
+
+function applyHighlighter () {
+  [].forEach.call(d.querySelectorAll('code.lang'), hljs.highlightBlock);
+}
+
+module.exports = loadHighlighter;
+
+},{"hyperscript":4}]},{},[11]);
+</script></body></html>
