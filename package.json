@@ -4,7 +4,7 @@
   "description": "A journey into the React codebase",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir -p dist && marki --dir=react/ --url='https://github.com/facebook/react/blob/v0.13.1' docs.md > dist/index.html",
+    "build": "mkdir -p dist && marki --dir=react/ --url='https://github.com/facebook/react/blob/v0.13.1' docs.md > dist/docs.html",
     "publish-gh-pages": "npm run build && ./bin/publish-gh-pages",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

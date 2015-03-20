@@ -5,4 +5,7 @@ Greetings adventurer! On our last trip we explored a [popular nodejs library](ht
 
 It can be a daunting experience to be using your favourite framework and then suddenly find yourself knee-deep in stack traces with little idea of how to navigate your way out. After today's journey you'll be one step closer to mastering this weird and wonderful terrain.
 
-[Start the journey](http://x-team.github.io/explore-react/)
+[Start the journey](http://x-team.com/2015/03/xplorers-journey-react/)
+----
+
+you might also like to [leave a question / comment](https://github.com/x-team/explore-react/issues/new) or browse the [source](./docs.md) (use [npm run build](https://github.com/x-team/explore-react/blob/master/package.json#L7) to embed code snippets with [marki](https://www.npmjs.com/package/marki))
