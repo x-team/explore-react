@@ -9,3 +9,6 @@ It can be a daunting experience to be using your favourite framework and then su
 ----
 
 you might also like to [leave a question / comment](https://github.com/x-team/explore-react/issues/new) or browse the [source](./docs.md) (use [npm run build](https://github.com/x-team/explore-react/blob/master/package.json#L7) to embed code snippets with [marki](https://www.npmjs.com/package/marki))
+
+Maintained by the [developers at x-team](https://www.x-team.com) | [developer blog](https://www.x-team.com/blog/)
+
